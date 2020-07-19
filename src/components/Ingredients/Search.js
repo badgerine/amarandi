@@ -11,7 +11,7 @@ const Search = React.memo(props => {
   //executes after every re/render cycle of this cycle | 
   //[] only rerun when changes are detected on the properties listed in the array => effectively componentDidMount().
   useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       if (enteredFilter === inputRef.current.value) {
         const query = enteredFilter.length === 0 ? '' : `?orderBy="title"&equalTo="${enteredFilter}"`;
         fetch('https://burger-builder-ed94e.firebaseio.com/ingredients.json' + query)
@@ -30,7 +30,10 @@ const Search = React.memo(props => {
             onLoadIngredients(loadedIngredients.filter(ingredient => (ingredient.amount != null)));
           });
       }
-    }, 800)
+    }, 800);
+    return () => {
+      clearTimeout(timer);
+    }; //useEffect returns a function, we will use this to clean up the timer in setTimeout(). I.e. a timer is created for every key stroke.
   }, [enteredFilter, onLoadIngredients, inputRef]);
 
   return (
