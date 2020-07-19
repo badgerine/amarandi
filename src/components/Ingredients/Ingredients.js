@@ -7,11 +7,9 @@ import Search from './Search';
 function Ingredients() {
   const [ingredients, setIngredients] = useState([]);
 
-  
-
   useEffect(() => {
-    console.log('RENDERING INGREDIENTS.',ingredients)
-  },[ingredients]);
+    console.log('RENDERING INGREDIENTS.', ingredients)
+  }, [ingredients]);
 
   const addIngredientHandler = ingredient => {
     fetch('https://burger-builder-ed94e.firebaseio.com/ingredients.json', {
@@ -33,9 +31,17 @@ function Ingredients() {
   }, []);
 
   const removeIngredientHandler = ingredientId => {
-    setIngredients(prevIngredients => prevIngredients.filter(
-      ingredientItem => (ingredientItem.id !== ingredientId)
-    ));
+    fetch(`https://burger-builder-ed94e.firebaseio.com/ingredients/${ingredientId}.json`, {
+      method: 'DELETE',
+    }).then(response => {
+      return response.json();
+    }).then(responseData => {
+      console.log('response.json()=', responseData);
+      setIngredients(prevIngredients => prevIngredients.filter(
+        ingredientItem => (ingredientItem.id !== ingredientId)
+      ));
+    });
+
   }
 
   return (
@@ -43,7 +49,7 @@ function Ingredients() {
       <IngredientForm onAddIngredient={(enteredIngredient) => addIngredientHandler(enteredIngredient)} />
 
       <section>
-        <Search onLoadIngredients={filteredIngredientsHandler}/>
+        <Search onLoadIngredients={filteredIngredientsHandler} />
         <IngredientList ingredients={ingredients} onRemoveItem={(ingredientId) => removeIngredientHandler(ingredientId)} />
       </section>
     </div>
