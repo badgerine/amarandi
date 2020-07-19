@@ -7,9 +7,11 @@ const Search = React.memo(props => {
   const { onLoadIngredients } = props;
   const [enteredFilter, setEnteredFilter] = useState('');
 
+  //executes after every re/render cycle of this cycle | 
+  //[] only rerun when changes are detected on the properties listed in the array => effectively componentDidMount().
   useEffect(()=> {
     const query = enteredFilter.length === 0 ? '' : `?orderBy="title"&equalTo="${enteredFilter}"`;
-    fetch('https://burger-builder-ed94e.firebaseio.com/ingredients.json'=query)
+    fetch('https://burger-builder-ed94e.firebaseio.com/ingredients.json'+query)
     .then(response => {
       return response.json();
     }).then(responseData => {
@@ -24,7 +26,7 @@ const Search = React.memo(props => {
       // setIngredients(loadedIngredients.filter(ingredient => (ingredient.amount != null)));
       onLoadIngredients(loadedIngredients.filter(ingredient => (ingredient.amount != null)));
     });
-  },[enteredFilter])
+  },[enteredFilter, onLoadIngredients]);
 
   return (
     <section className="search">
