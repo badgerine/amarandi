@@ -54,7 +54,7 @@ function Ingredients() {
       <IngredientForm onAddIngredient={(enteredIngredient) => addIngredientHandler(enteredIngredient)} />
 
       <section>
-        <Search />
+        <Search onLoadIngredients={(filteredIngredients) => setIngredients(filteredIngredients)}/>
         <IngredientList ingredients={ingredients} onRemoveItem={(ingredientId) => removeIngredient(ingredientId)} />
       </section>
     </div>

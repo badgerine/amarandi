@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import './IngredientList.css';
 
 const IngredientList = props => {
+
   return (
     <section className="ingredient-list">
       <h2>Loaded Ingredients</h2>
