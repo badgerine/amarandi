@@ -34,14 +34,11 @@ function Ingredients() {
     fetch(`https://burger-builder-ed94e.firebaseio.com/ingredients/${ingredientId}.json`, {
       method: 'DELETE',
     }).then(response => {
-      return response.json();
-    }).then(responseData => {
-      console.log('response.json()=', responseData);
+      console.log('response=', response);
       setIngredients(prevIngredients => prevIngredients.filter(
         ingredientItem => (ingredientItem.id !== ingredientId)
       ));
     });
-
   }
 
   return (
