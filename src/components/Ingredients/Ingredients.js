@@ -24,6 +24,10 @@ function Ingredients() {
       });
   }, []);//executes after every re/render cycle of this cycle | [] only rerun when changes are detected on the properties here => effectively componentDidMount().
 
+  useEffect(() => {
+    console.log('RENDERING INGREDIENTS.',ingredients)
+  },[ingredients])
+
   const addIngredientHandler = ingredient => {
     fetch('https://burger-builder-ed94e.firebaseio.com/ingredients.json', {
       method: 'POST',
