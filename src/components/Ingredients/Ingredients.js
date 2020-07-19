@@ -8,10 +8,20 @@ function Ingredients() {
   const [ingredients, setIngredients] = useState([]);
 
   const addIngredientHandler = ingredient => {
-    setIngredients(prevIngredients => [
-      ...prevIngredients,
-      { id: Math.random().toString(), ...ingredient }
-    ]);
+    fetch('https://burger-builder-ed94e.firebaseio.com/ingredients.json', {
+      method: 'POST',
+      body: JSON.stringify(ingredient),
+      headers: { 'Content_Type': 'application/JSON' }
+    }).then(response => {
+      return response.json();
+    }).then(responseData => {
+      setIngredients(prevIngredients => [
+        ...prevIngredients,
+        { id: responseData.name, ...ingredient }
+      ]);
+    }
+
+    );
   }
 
   const removeIngredient = ingredientId => {
@@ -22,7 +32,7 @@ function Ingredients() {
 
   return (
     <div className="App">
-      <IngredientForm onAddIngredient={(enteredIngredient) => addIngredientHandler(enteredIngredient)}/>
+      <IngredientForm onAddIngredient={(enteredIngredient) => addIngredientHandler(enteredIngredient)} />
 
       <section>
         <Search />
