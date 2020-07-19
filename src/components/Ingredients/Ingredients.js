@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import IngredientForm from './IngredientForm';
 import IngredientList from './IngredientList';
@@ -6,6 +6,23 @@ import Search from './Search';
 
 function Ingredients() {
   const [ingredients, setIngredients] = useState([]);
+
+  useEffect(() => {
+    fetch('https://burger-builder-ed94e.firebaseio.com/ingredients.json')
+      .then(response => {
+        return response.json();
+      }).then(responseData => {
+        console.log('responseData=', responseData);
+        const loadedIngredients = [];
+        for (let key in responseData) {
+          loadedIngredients.push({
+            id: key,
+            ...responseData[key]
+          });
+        }
+        setIngredients(loadedIngredients.filter(ingredient => (ingredient.amount != null)));
+      });
+  }, []);//executes after every re/render cycle of this cycle | [] only rerun when changes are detected on the properties here => effectively componentDidMount().
 
   const addIngredientHandler = ingredient => {
     fetch('https://burger-builder-ed94e.firebaseio.com/ingredients.json', {
@@ -19,9 +36,7 @@ function Ingredients() {
         ...prevIngredients,
         { id: responseData.name, ...ingredient }
       ]);
-    }
-
-    );
+    });
   }
 
   const removeIngredient = ingredientId => {
