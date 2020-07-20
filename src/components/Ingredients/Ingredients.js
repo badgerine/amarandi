@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useReducer } from 'react';
+import React, { useEffect, useCallback, useReducer } from 'react';
 
 import IngredientForm from './IngredientForm';
 import IngredientList from './IngredientList';
@@ -18,68 +18,79 @@ const ingredientReducer = (currentIngredients, action) => {
   }
 }
 
+const requestReducer = (requestState, action) => {
+  switch (action.type) {
+    case 'SEND':
+      return { loading: true, error: null };
+    case 'SUCCESSFUL':
+      return { ...requestState, loading: false };
+    case 'ERROR':
+      return { loading: false, error: action.error };
+    case 'RESET':
+      return { loading: false, error: null };
+    default:
+      throw new Error('Should not be reached!')
+  }
+}
+
 function Ingredients() {
-  const [ingredients, dispatch] = useReducer(ingredientReducer, []);
-  // const [ingredients, setIngredients] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState();
+  const [ingredients, dispatchIngredient] = useReducer(ingredientReducer, []);
+  const [requestState, dispatchRequest] = useReducer(requestReducer, { loading: false, error: null });
 
   useEffect(() => {
     console.log('RENDERING INGREDIENTS.', ingredients)
   }, [ingredients]);
 
   const addIngredientHandler = ingredient => {
-    setIsLoading(true);
+    dispatchRequest({ type: 'SEND' });
     fetch('https://burger-builder-ed94e.firebaseio.com/ingredients.json', {
       method: 'POST',
       body: JSON.stringify(ingredient),
       headers: { 'Content_Type': 'application/JSON' }
     }).then(response => {
-      setIsLoading(false);
       return response.json();
     }).then(responseData => {
-      dispatch({
+      dispatchIngredient({
         type: 'ADD',
-        ingredient: {id: responseData.name, ...ingredient}
+        ingredient: { id: responseData.name, ...ingredient }
       });
+      dispatchRequest({ type: 'SUCCESSFUL' });
     }).catch(err => {
-      setIsLoading(false);
-      setError('Something went wrong.', err.message);
+      dispatchRequest({ type: 'ERROR', error: 'Something went wrong. ' + err.message });
     });
   }
 
   const filteredIngredientsHandler = useCallback(filteredIngredients => {
-    dispatch({
+    dispatchIngredient({
       type: 'SET',
       ingredients: filteredIngredients
     });
   }, []);
 
   const removeIngredientHandler = ingredientId => {
-    setIsLoading(true);
+    dispatchRequest({ type: 'SEND' });
     fetch(`https://burger-builder-ed94e.firebaseio.com/ingredients/${ingredientId}.json`, {
       method: 'DELETE',
     }).then(response => {
-      setIsLoading(false);
+      dispatchRequest({ type: 'SUCCESSFUL' });
       console.log('response=', response);
-      dispatch({
+      dispatchIngredient({
         type: 'DELETE',
         id: ingredientId
       });
     }).catch(err => {
-      setIsLoading(false);
-      setError('Something went wrong.', err.message);
+      dispatchRequest({ type: 'ERROR', error: 'Something went wrong. ' + err.message });
     });
   }
 
   const clearError = () => {
-    setError(null);
+    dispatchRequest({ type: 'RESET' });
   }
 
   return (
     <div className="App">
-      {error && <ErrorModal onClose={clearError}>{error}</ErrorModal>}
-      <IngredientForm onAddIngredient={(enteredIngredient) => addIngredientHandler(enteredIngredient)} loading={isLoading} />
+      {requestState.error && <ErrorModal onClose={clearError}>{requestState.error}</ErrorModal>}
+      <IngredientForm onAddIngredient={(enteredIngredient) => addIngredientHandler(enteredIngredient)} loading={requestState.loading} />
 
       <section>
         <Search onLoadIngredients={filteredIngredientsHandler} />
