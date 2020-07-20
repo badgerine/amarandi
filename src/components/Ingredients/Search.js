@@ -3,7 +3,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import Card from '../UI/Card';
 import './Search.css';
 
+let renderCount = 0;
 const Search = React.memo(props => {
+  console.log('[Search] renderCount=',++renderCount);
   const { onLoadIngredients } = props;
   const [enteredFilter, setEnteredFilter] = useState('');
   const inputRef = useRef();
@@ -11,19 +13,20 @@ const Search = React.memo(props => {
   //executes after every re/render cycle of this cycle | 
   //[] only rerun when changes are detected on the properties listed in the array => effectively componentDidMount().
   useEffect(() => {
+    console.log('[Search.useEffect[enteredFilter, onLoadIngredients, inputRef]] update=', enteredFilter,inputRef);
     const timer = setTimeout(() => {
       if (enteredFilter === inputRef.current.value) {
         const query = enteredFilter.length === 0 ? '' : `?orderBy="title"&equalTo="${enteredFilter}"`;
         fetch('https://burger-builder-ed94e.firebaseio.com/ingredients.json' + query)
           .then(response => {
             return response.json();
-          }).then(responseData => {
-            console.log('responseData=', responseData);
+          }).then(responseJSObject => {
+            console.log('responseJSObject=', responseJSObject);
             const loadedIngredients = [];
-            for (let key in responseData) {
+            for (let key in responseJSObject) {
               loadedIngredients.push({
                 id: key,
-                ...responseData[key]
+                ...responseJSObject[key]
               });
             }
             // setIngredients(loadedIngredients.filter(ingredient => (ingredient.amount != null)));

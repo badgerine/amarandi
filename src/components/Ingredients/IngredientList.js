@@ -2,8 +2,9 @@ import React, { useEffect } from 'react';
 
 import './IngredientList.css';
 
+let renderCounter = 0;
 const IngredientList = props => {
-
+  console.log('[IngredientList] renderCount=', ++renderCounter, 'ingredientCount=',props.ingredients.length);
   return (
     <section className="ingredient-list">
       <h2>Loaded Ingredients</h2>

@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useReducer } from 'react';
+import React, { useEffect, useCallback, useReducer, useMemo } from 'react';
 
 import IngredientForm from './IngredientForm';
 import IngredientList from './IngredientList';
@@ -33,15 +33,17 @@ const requestReducer = (requestState, action) => {
   }
 }
 
+let renderCounter = 0;
 function Ingredients() {
+  console.log('[Ingredients] renderCount=', ++renderCounter);
   const [ingredients, dispatchIngredient] = useReducer(ingredientReducer, []);
   const [requestState, dispatchRequest] = useReducer(requestReducer, { loading: false, error: null });
 
   useEffect(() => {
-    console.log('RENDERING INGREDIENTS.', ingredients)
+    console.log('[Ingredients.useEffect[ingredients]] update=', ingredients);
   }, [ingredients]);
 
-  const addIngredientHandler = ingredient => {
+  const addIngredientHandler = useCallback(ingredient => {
     dispatchRequest({ type: 'SEND' });
     fetch('https://burger-builder-ed94e.firebaseio.com/ingredients.json', {
       method: 'POST',
@@ -58,7 +60,7 @@ function Ingredients() {
     }).catch(err => {
       dispatchRequest({ type: 'ERROR', error: 'Something went wrong. ' + err.message });
     });
-  }
+  },[]);
 
   const filteredIngredientsHandler = useCallback(filteredIngredients => {
     dispatchIngredient({
@@ -67,7 +69,7 @@ function Ingredients() {
     });
   }, []);
 
-  const removeIngredientHandler = ingredientId => {
+  const removeIngredientHandler = useCallback(ingredientId => {
     dispatchRequest({ type: 'SEND' });
     fetch(`https://burger-builder-ed94e.firebaseio.com/ingredients/${ingredientId}.json`, {
       method: 'DELETE',
@@ -81,11 +83,15 @@ function Ingredients() {
     }).catch(err => {
       dispatchRequest({ type: 'ERROR', error: 'Something went wrong. ' + err.message });
     });
-  }
+  },[]);
 
-  const clearError = () => {
+  const clearError = useCallback(() => {
     dispatchRequest({ type: 'RESET' });
-  }
+  },[]);
+
+  const ingredientList = useMemo(() => (
+    <IngredientList ingredients={ingredients} onRemoveItem={(ingredientId) => removeIngredientHandler(ingredientId)} />
+  ),[ingredients]);
 
   return (
     <div className="App">
@@ -94,7 +100,7 @@ function Ingredients() {
 
       <section>
         <Search onLoadIngredients={filteredIngredientsHandler} />
-        <IngredientList ingredients={ingredients} onRemoveItem={(ingredientId) => removeIngredientHandler(ingredientId)} />
+        {ingredientList}
       </section>
     </div>
   );

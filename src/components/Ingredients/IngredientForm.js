@@ -4,7 +4,9 @@ import Card from '../UI/Card';
 import LoadingIndicator from '../UI/LoadingIndicator';
 import './IngredientForm.css';
 
+let renderCount = 0;
 const IngredientForm = React.memo(props => {
+  console.log('[IngredientForm] renderCount=',++renderCount);
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
 
