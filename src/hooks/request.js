@@ -3,9 +3,9 @@ import { useReducer, useCallback } from 'react';
 const requestReducer = (requestState, action) => {
   switch (action.type) {
     case 'SEND':
-      return { loading: true, error: null, data: null };
+      return { loading: true, error: null, data: null, requestExtra: action.extra };
     case 'SUCCESSFUL':
-      return { ...requestState, loading: false, data: action.responseData };
+      return { ...requestState, loading: false, data: action.responseData, };
     case 'ERROR':
       return { loading: false, error: action.error };
     case 'RESET':
@@ -16,10 +16,16 @@ const requestReducer = (requestState, action) => {
 }
 
 const useRequest = () => {
-  const [requestState, dispatchRequest] = useReducer(requestReducer, { loading: false, error: null, data: null });
+  const [requestState, dispatchRequest] = useReducer(requestReducer,
+    {
+      loading: false,
+      error: null,
+      data: null,
+      extra: null
+    });
 
-  const sendRequest = useCallback((url, method, body) => {
-    dispatchRequest({ type: 'SEND' });
+  const sendRequest = useCallback((url, method, body, requestExtra) => {
+    dispatchRequest({ type: 'SEND', extra: requestExtra });
     fetch(url, {
       method: method,
       body: body,
@@ -38,7 +44,8 @@ const useRequest = () => {
     isLoading: requestState.loading,
     data: requestState.data,
     error: requestState.errror,
-    sendRequest: sendRequest
+    sendRequest: sendRequest,
+    requestExtra: requestState.requestExtra
   }
 };
 

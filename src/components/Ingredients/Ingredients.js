@@ -5,6 +5,7 @@ import IngredientForm from './IngredientForm';
 import IngredientList from './IngredientList';
 import Search from './Search';
 import ErrorModal from '../UI/ErrorModal';
+import LoadingIndicator from '../UI/LoadingIndicator';
 
 const ingredientReducer = (currentIngredients, action) => {
   switch (action.type) {
@@ -23,13 +24,23 @@ let renderCounter = 0;
 function Ingredients() {
   console.log('[Ingredients] renderCount=', ++renderCounter);
   const [ingredients, dispatchIngredient] = useReducer(ingredientReducer, []);
-  const { isLoading, error, data, sendRequest } = useRequest();
+  const { isLoading, error, data, sendRequest, requestExtra } = useRequest();
 
   useEffect(() => {
-    console.log('[Ingredients.useEffect[ingredients]] update=', ingredients);
-  }, [ingredients]);
+    if(data !== null){
+      dispatchIngredient({type: 'ADD', ingredient: { id: data.name, ...data }})
+    }
+  }, [data]);
+
+  useEffect(() => {
+    dispatchIngredient({ type: 'DELETE', id: requestExtra })
+  }, [requestExtra]);
 
   const addIngredientHandler = useCallback(ingredient => {
+    sendRequest('https://burger-builder-ed94e.firebaseio.com/ingredients.json',
+    'POST',
+    JSON.stringify(ingredient));
+
     // dispatchRequest({ type: 'SEND' });
     // fetch('https://burger-builder-ed94e.firebaseio.com/ingredients.json', {
     //   method: 'POST',
@@ -57,8 +68,10 @@ function Ingredients() {
 
   const removeIngredientHandler = useCallback(ingredientId => {
     sendRequest(`https://burger-builder-ed94e.firebaseio.com/ingredients/${ingredientId}.json`,
-    'DELETE');
-    
+      'DELETE',
+      null,
+      ingredientId);
+
     // dispatchRequest({ type: 'SEND' });
     // fetch(`https://burger-builder-ed94e.firebaseio.com/ingredients/${ingredientId}.json`, {
     //   method: 'DELETE',
@@ -85,7 +98,7 @@ function Ingredients() {
   return (
     <div className="App">
       {error && <ErrorModal onClose={clearError}>{error}</ErrorModal>}
-      <IngredientForm onAddIngredient={(enteredIngredient) => addIngredientHandler(enteredIngredient)} loading={isLoading} />
+      <IngredientForm onAddIngredient={(enteredIngredient) => addIngredientHandler(enteredIngredient)} />
 
       <section>
         <Search onLoadIngredients={filteredIngredientsHandler} />
