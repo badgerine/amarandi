@@ -2,21 +2,21 @@ import React, { useState } from 'react';
 
 import Card from '../UI/Card';
 import LoadingIndicator from '../UI/LoadingIndicator';
-import './IngredientForm.css';
+import './ProductForm.css';
 
 let renderCount = 0;
-const IngredientForm = React.memo(props => {
-  console.log('[IngredientForm] renderCount=',++renderCount);
+const ProductForm = React.memo(props => {
+  console.log('[ProductForm] renderCount=',++renderCount);
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
 
   const submitHandler = event => {
     event.preventDefault();
-    props.onAddIngredient({title, amount})
+    props.onAddProduct({title, amount})
   };
 
   return (
-    <section className="ingredient-form">
+    <section className="product-form">
       <Card>
         <form onSubmit={submitHandler}>
           <div className="form-control">
@@ -34,8 +34,8 @@ const IngredientForm = React.memo(props => {
                 return enteredValue;
                 })}}/>
           </div>
-          <div className="ingredient-form__actions">
-            <button type="submit">Add Ingredient</button>
+          <div className="product-form__actions">
+            <button type="submit">Add Product</button>
           </div>
         </form>
       </Card>
@@ -43,4 +43,4 @@ const IngredientForm = React.memo(props => {
   );
 });
 
-export default IngredientForm;
+export default ProductForm;
