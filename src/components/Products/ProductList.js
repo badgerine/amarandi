@@ -9,10 +9,10 @@ const ProductList = props => {
     <section className="product-list">
       <h2>Loaded Products</h2>
       <ul>
-        {props.products.map(ig => (
-           <li key={ig.id} onClick={props.onRemoveItem.bind(this, ig.id)}>
-            <span>{ig.title}</span>
-            <span>{ig.amount}x</span>
+        {props.products.map(prd => (
+           <li key={prd.id} onClick={props.onRemoveItem.bind(this, prd.id)}>
+            <span>{prd.title}</span>
+            <span>{prd.amount}x</span>
           </li>
         ))}
       </ul>

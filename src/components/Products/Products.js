@@ -3,9 +3,9 @@ import React, { useEffect, useCallback, useReducer, useMemo } from 'react';
 import useRequest from '../../hooks/request';
 import ProductForm from './ProductForm';
 import ProductList from './ProductList';
-import Search from './Search';
 import ErrorModal from '../UI/ErrorModal';
 import LoadingIndicator from '../UI/LoadingIndicator';
+import AppBar from '../UI/AppBar';
 
 const productReducer = (currentProducts, action) => {
   switch (action.type) {
@@ -21,7 +21,7 @@ const productReducer = (currentProducts, action) => {
 }
 
 let renderCounter = 0;
-function Products() {
+const Products = () => {
   console.log('[Products] renderCount=', ++renderCounter);
   const [products, dispatchProduct] = useReducer(productReducer, []);
   const { isLoading, error, data, sendRequest, requestExtra } = useRequest();
@@ -97,11 +97,11 @@ function Products() {
 
   return (
     <div className="App">
+      <AppBar onLoadProducts={filteredProductsHandler} />
       {error && <ErrorModal onClose={clearError}>{error}</ErrorModal>}
       <ProductForm onAddProduct={(enteredProduct) => addProductHandler(enteredProduct)} />
 
       <section>
-        <Search onLoadProducts={filteredProductsHandler} />
         {productList}
       </section>
     </div>
